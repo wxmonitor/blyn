@@ -42,6 +42,18 @@ shade <- shade %>%
   mutate_at(vars(dusk, dawn), ~ replace(., which(. > tail(hourly.forecast$dt, 1)), NA))
   
 
+rose <- ggplot(current, aes(x = wind_deg)) +
+  coord_polar(theta = "x", start = 0, direction = 1) +
+  geom_histogram(fill = "red", color = "gray10", bins = 30) +
+  scale_x_continuous(breaks = seq(0, 359, 22.5), limits = c(0, 359), 
+                     labels = c('N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 
+                                'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW')) +
+  theme_minimal() +
+  theme(
+    axis.text.y = element_blank(),
+    axis.title = element_blank())
+
+
 dir.plot <- ggplot() +
   geom_rect(data = shade, 
             aes(xmin = dusk, xmax = dawn, ymin = bottom, ymax = top), 
@@ -104,8 +116,11 @@ ui <- fluidPage(
   h1("Blyn Weather", align = "center"),
   h3("48 hour forecast", align = "center"),
   h4(textOutput("time.current"), align = "center"),
+  h4(textOutput("weather.label"), align = "center"),
   
   mainPanel(
+    fluidRow(column(12, align = "center",
+    plotOutput(outputId = "rose", width = "50%", height = "200px"))),
     plotOutput(outputId = "weather.plot", width = "100%", height = "400px"),
     plotOutput(outputId = "dir.plot", width = "100%", height = "400px"),
     plotOutput(outputId = "rain.plot", width = "100%", height = "400px"),
@@ -116,6 +131,18 @@ ui <- fluidPage(
 
 #Run r code on server
 server <- function(input, output) {
+  
+  output$time.current <- renderText({
+    paste("Current time:", Sys.time())
+  })
+  
+  output$weather.label <- renderText({
+    paste0(wind.rose(current$wind_deg), " ",
+           round(current$wind_speed, 0), " knots ",
+           "(", current$wind_deg, "°)")
+    
+  }) 
+  
   
   output$weather.plot <- renderPlot({
     weather.plot
@@ -138,6 +165,10 @@ server <- function(input, output) {
   
   output$bar.plot <- renderPlot({
     bar.plot
+  }) 
+  
+  output$rose <- renderPlot({
+    rose
   }) 
   
 }
