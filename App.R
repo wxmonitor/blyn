@@ -118,14 +118,12 @@ ui <- fluidPage(
   h4(textOutput("time.current"), align = "center"),
   h4(textOutput("weather.label"), align = "center"),
   
-  mainPanel(
     fluidRow(column(12, align = "center",
     plotOutput(outputId = "rose", width = "50%", height = "200px"))),
     plotOutput(outputId = "weather.plot", width = "100%", height = "400px"),
     plotOutput(outputId = "dir.plot", width = "100%", height = "400px"),
     plotOutput(outputId = "rain.plot", width = "100%", height = "400px"),
     plotOutput(outputId = "bar.plot", width = "100%", height = "400px")
-  )
 )
 
 
