@@ -39,7 +39,10 @@ shade <- data.frame(dusk = seq.POSIXt(current$sunset, by = 'day', length.out = 3
                     bottom = -Inf)
 
 shade <- shade %>% 
-  mutate_at(vars(dusk, dawn), ~ replace(., which(. > tail(hourly.forecast$dt, 1)), NA))
+  mutate_at(vars(dusk, dawn),
+            ~ replace(., which(. > tail(hourly.forecast$dt, 1)), tail(hourly.forecast$dt, 1))) %>%
+  mutate_at(vars(dusk, dawn),
+            ~ replace(., which(. < head(hourly.forecast$dt, 1)), head(hourly.forecast$dt, 1)))
   
 
 rose <- ggplot(current, aes(x = wind_deg)) +
@@ -64,7 +67,9 @@ dir.plot <- ggplot() +
   theme(plot.title = element_markdown()) +
   ylab("") +
   xlab("") +
-  scale_y_discrete(limits = c('N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW', 'N'))
+  scale_y_discrete(limits = c('N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW', 'N')) +
+  scale_x_datetime(limits = c(min(hourly.forecast$dt), max(hourly.forecast$dt)), expand = c(0, 0))
+
 
 bar.plot <- ggplot() + 
   geom_rect(data = shade, 
@@ -76,7 +81,9 @@ bar.plot <- ggplot() +
   labs(title = "**Barometric Pressure**") +
   theme(plot.title = element_markdown()) +
   ylab("Millibars") +
-  xlab("")  
+  xlab("") +
+  scale_x_datetime(limits = c(min(hourly.forecast$dt), max(hourly.forecast$dt)), expand = c(0, 0))
+
 
 
 weather.plot <- ggplot() +
@@ -91,7 +98,7 @@ weather.plot <- ggplot() +
   theme(plot.title = element_markdown()) +
   ylab("Knots") +
   xlab("") + 
-  xlim(c(min(hourly.forecast$dt), max(hourly.forecast$dt)))
+  scale_x_datetime(limits = c(min(hourly.forecast$dt), max(hourly.forecast$dt)), expand = c(0, 0))
 
 
 rain.plot <- ggplot() +
@@ -100,15 +107,17 @@ rain.plot <- ggplot() +
             fill = 'light grey', alpha = 0.5) +
   geom_line(data = hourly.forecast, aes(x = dt, y = pop), size = 1) +
   geom_col(data = hourly.forecast, aes(x = dt, y = rain.1h/5), color = "darkgrey", fill = "#28d0eb") +
-  geom_text(data = hourly.forecast, aes(x = dt, y = rain.1h/5, label = rain.1h), size = 2.5, vjust = -0.5) +
+  geom_text(data = hourly.forecast, aes(x = dt, y = rain.1h/5, label = rain.1h), size = 2, vjust = -0.5) +
   theme_bw() +
   labs(
-    title = "**Chance of Rain** and <span style='color:#28d0eb;'>**Accumulation**</span></span> (mm/hr)") +
+    title = "**Chance of Rain** and <span style='color:#28d0eb;'>**Accumulation**</span></span> (mm)") +
   theme(plot.title = element_markdown()) +
   ylab("Percent") + 
   xlab("") +
   scale_y_continuous(labels = percent_format(accuracy = 1)) +
-  coord_cartesian(ylim = c(0,1))
+  coord_cartesian(ylim = c(0,1)) +
+  scale_x_datetime(limits = c(min(hourly.forecast$dt), max(hourly.forecast$dt)), expand = c(0, 0))
+
 
 
 # Construct UI
