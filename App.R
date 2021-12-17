@@ -3,7 +3,6 @@ library(jsonlite)
 library(shiny)
 library(scales)
 library(ggtext)
-library(curl)
 
 
 # Blyn 48 hour forecast
@@ -30,8 +29,7 @@ hourly.forecast <- hourly.forecast %>%
   mutate(wind_gust = wind_gust * 0.868976)
 
 current <- current %>%
-  mutate(wind_speed = wind_speed * 0.868976) %>%
-  mutate(wind_gust = wind_gust * 0.868976)
+  mutate(wind_speed = wind_speed * 0.868976)
 
 shade <- data.frame(dusk = seq.POSIXt(current$sunset, by = 'day', length.out = 3), 
                     dawn = seq.POSIXt(current$sunrise+86400, by = 'day', length.out = 3),
