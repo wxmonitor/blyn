@@ -98,7 +98,8 @@ weather.plot <- ggplot() +
   xlab("") + 
   scale_x_datetime(limits = c(min(hourly.forecast$dt), max(hourly.forecast$dt)), expand = c(0, 0))
 
-
+if ("rain.1h" %in% colnames(hourly.forecast)) {
+  
 rain.plot <- ggplot() +
   geom_rect(data = shade, 
             aes(xmin = dusk, xmax = dawn, ymin = bottom, ymax = top), 
@@ -116,7 +117,22 @@ rain.plot <- ggplot() +
   coord_cartesian(ylim = c(0,1)) +
   scale_x_datetime(limits = c(min(hourly.forecast$dt), max(hourly.forecast$dt)), expand = c(0, 0))
 
-
+} else (
+rain.plot <- ggplot() +
+  geom_rect(data = shade, 
+            aes(xmin = dusk, xmax = dawn, ymin = bottom, ymax = top), 
+            fill = 'light grey', alpha = 0.5) +
+  geom_line(data = hourly.forecast, aes(x = dt, y = pop), size = 1) +
+  theme_bw() +
+  labs(
+    title = "**Chance of Rain** and <span style='color:#28d0eb;'>**Accumulation**</span></span> (mm)") +
+  theme(plot.title = element_markdown()) +
+  ylab("Percent") + 
+  xlab("") +
+  scale_y_continuous(labels = percent_format(accuracy = 1)) +
+  coord_cartesian(ylim = c(0,1)) +
+  scale_x_datetime(limits = c(min(hourly.forecast$dt), max(hourly.forecast$dt)), expand = c(0, 0))
+)
 
 # Construct UI
 ui <- fluidPage(
@@ -162,7 +178,7 @@ server <- function(input, output) {
     dir.plot
   })
   
-  
+
   output$rain.plot <- renderPlot({
     rain.plot
   })
