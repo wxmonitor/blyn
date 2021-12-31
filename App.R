@@ -139,8 +139,8 @@ rain.plot <- ggplot() +
 
 # Construct UI
 ui <- fluidPage(
-  h1("Blyn Weather", align = "center"),
-  h3("48 hour forecast", align = "center"),
+  h5("WX Monitor", align = "center"),
+  h3("Blyn 48 hour forecast", align = "center"),
   h4(textOutput("time.current"), align = "center"),
   h4(textOutput("weather.label"), align = "center"),
   
@@ -173,7 +173,7 @@ server <- function(input, output) {
   }) 
   
   output$time.current <- renderText({
-    paste("",Sys.time())
+    paste("",format(Sys.time(), "%a %m-%d %H:%M"))
   })
   
   
