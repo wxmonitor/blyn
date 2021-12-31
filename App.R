@@ -29,7 +29,11 @@ hourly.forecast <- hourly.forecast %>%
   mutate(wind_gust = wind_gust * 0.868976)
 
 current <- current %>%
-  mutate(wind_speed = wind_speed * 0.868976)
+  mutate(wind_speed = wind_speed * 0.868976) %>%
+  mutate(wind_deg = as.integer(wind_deg)) %>%
+  mutate(mod_deg = case_when(wind_deg > 352 && wind_deg < 356 ~ 352L,
+                             wind_deg >= 356 && wind_deg <= 360 ~ 0L,
+                             TRUE ~ wind_deg))
 
 shade <- data.frame(dusk = seq.POSIXt(current$sunset, by = 'day', length.out = 3), 
                     dawn = seq.POSIXt(current$sunrise+86400, by = 'day', length.out = 3),
@@ -42,11 +46,10 @@ shade <- shade %>%
   mutate_at(vars(dusk, dawn),
             ~ replace(., which(. < head(hourly.forecast$dt, 1)), head(hourly.forecast$dt, 1)))
   
-
-rose <- ggplot(current, aes(x = wind_deg)) +
-  coord_polar(theta = "x", start = 0, direction = 1) +
-  geom_histogram(fill = "red", color = "gray10", bins = 30) +
-  scale_x_continuous(breaks = seq(0, 359, 22.5), limits = c(0, 359), 
+rose <- ggplot(current, aes(x = mod_deg)) +
+  coord_polar(theta = "x", start = -pi/45, direction = 1) +
+  geom_bar(width = 7, color = "gray10", fill = "red") +
+  scale_x_continuous(breaks = seq(0, 359, 22.5), limits = c(-4, 356), 
                      labels = c('N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 
                                 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW')) +
   theme_minimal() +
