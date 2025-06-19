@@ -18,7 +18,7 @@ wind.rose <- function(x) {
 Sys.setenv(TZ="America/Los_Angeles")
 
 #  Call API and decode JSON
-url <- "https://api.openweathermap.org/data/2.5/onecall?lat=48.02307&lon=-122.999698&exclude=minutely&units=imperial&appid=8d5cf85099c375dcad074eff91b0d5d9"
+url <- "https://api.openweathermap.org/data/3.0/onecall?lat=48.02307&lon=-122.99969&exclude=minutely&units=imperial&appid=8d5cf85099c375dcad074eff91b0d5d9"
 weather.page <- fromJSON(url, flatten = TRUE)
 
 # Strip and format hourly data
